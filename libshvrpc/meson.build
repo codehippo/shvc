@@ -1,0 +1,36 @@
+libshvrpc_sources = [
+  files(
+    'rpcurl.c',
+    'rpcclient.c',
+    'rpcclient_stream.c',
+    'rpcclient_serial.c',
+    'rpcclient_datagram.c',
+  ),
+  gperf.process('rpcurl_scheme.gperf'),
+  gperf.process('rpcurl_query.gperf'),
+]
+libshvrpc_dependencies = [libshvchainpack_dep, uriparser]
+
+libshvrpc = library(
+  'shvrpc',
+  libshvrpc_sources,
+  version: '0.0.0',
+  dependencies: libshvrpc_dependencies,
+  include_directories: includes,
+  link_args: '-Wl,--version-script=' + join_paths(
+    meson.current_source_dir(),
+    'libshvrpc.version',
+  ),
+  install: not meson.is_subproject(),
+)
+install_headers(libshvrpc_headers)
+
+libshvrpc_dep = declare_dependency(
+  dependencies: libshvrpc_dependencies,
+  include_directories: includes,
+  link_with: libshvrpc,
+)
+
+
+pkg_mod = import('pkgconfig')
+pkg_mod.generate(libshvrpc, description: 'Silicon Heaven RPC')
