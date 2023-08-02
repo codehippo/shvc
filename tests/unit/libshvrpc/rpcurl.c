@@ -142,12 +142,13 @@ static const struct {
 	size_t error;
 } parse_invalid_d[] = {
 	{"foo://some", 0},
-	{"udp://some:none?password=foo", 15}, // We parse it backward so end of the port
+	{"udp://some:none?password=foo", 15}, // We parse it backward so end of the
+										  // port
 	{"udp://some?invalid=foo", 11},
 };
 ARRAY_TEST(parse, parse_invalid, parse_invalid_d) {
 	const char *err;
 	ck_assert_ptr_null(rpcurl_parse(_d.str, &err));
-	ck_assert_ptr_eq(err, _d.str +_d.error);
+	ck_assert_ptr_eq(err, _d.str + _d.error);
 }
 END_TEST

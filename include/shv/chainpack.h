@@ -36,8 +36,7 @@ const char *chainpack_packing_schema_name(int sch);
 
 void chainpack_pack_uint_data(cpcp_pack_context *pack_context, uint64_t num);
 
-void chainpack_pack_null(cpcp_pack_context *pack_context)
-	__attribute__((nonnull));
+void chainpack_pack_null(cpcp_pack_context *pack_context) __attribute__((nonnull));
 
 void chainpack_pack_boolean(cpcp_pack_context *pack_context, bool b)
 	__attribute__((nonnull));
@@ -51,11 +50,11 @@ void chainpack_pack_uint(cpcp_pack_context *pack_context, uint64_t i)
 void chainpack_pack_double(cpcp_pack_context *pack_context, double d)
 	__attribute__((nonnull));
 
-void chainpack_pack_decimal(cpcp_pack_context *pack_context, const cpcp_decimal *v)
-	__attribute__((nonnull));
+void chainpack_pack_decimal(cpcp_pack_context *pack_context,
+	const cpcp_decimal *v) __attribute__((nonnull));
 
-void chainpack_pack_date_time(cpcp_pack_context *pack_context, const cpcp_date_time *v)
-	__attribute__((nonnull));
+void chainpack_pack_date_time(cpcp_pack_context *pack_context,
+	const cpcp_date_time *v) __attribute__((nonnull));
 
 void chainpack_pack_blob(
 	cpcp_pack_context *pack_context, const uint8_t *buff, size_t buff_len);

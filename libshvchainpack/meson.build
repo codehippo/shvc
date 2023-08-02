@@ -1,5 +1,7 @@
 libshvchainpack_sources = files(
   'chainpack.c',
+  'chainpack_pack.c',
+  'chainpack_unpack.c',
   'cpcp.c',
   'cpcp_convert.c',
   'cpon.c',

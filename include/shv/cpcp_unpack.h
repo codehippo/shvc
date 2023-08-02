@@ -111,7 +111,6 @@ typedef struct cpcp_unpack_context {
 	const char *err_msg;
 	cpcp_container_stack *container_stack;
 	cpcp_unpack_underflow_handler handle_unpack_underflow;
-	void *custom_context;
 	char default_string_chunk_buff[CPCP_STRING_CHUNK_BUFF_LEN];
 	char *string_chunk_buff;
 	size_t string_chunk_buff_len;

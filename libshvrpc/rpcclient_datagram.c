@@ -1,4 +1,4 @@
-#include "rpcclient.h"
+#include <shv/rpcclient.h>
 
 struct rpcclient *rpcclient_datagram_new(void) {
 	// TODO

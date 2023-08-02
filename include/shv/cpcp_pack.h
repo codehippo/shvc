@@ -22,7 +22,6 @@ typedef struct cpcp_pack_context {
 	int nest_count;
 	int err_no; /* handlers can save error here */
 	cpcp_pack_overflow_handler handle_pack_overflow;
-	void *custom_context;
 	cpcp_cpon_pack_options cpon_options;
 	size_t bytes_written;
 } cpcp_pack_context;

@@ -5,6 +5,9 @@ option(
   description: 'Expect tests to be build and check for their dependencies',
 )
 
+# libshvchainpack
+
+# libshvrpc
 option(
   'unpack_bufsiz',
   type: 'integer',

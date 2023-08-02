@@ -1,9 +1,9 @@
 #include <shv/cpcp.h>
-
 #include <string.h>
 
-const char *cpcp_error_string(int err_no) {
-	switch (err_no) {
+
+const char *cpcp_error_string(enum cpcp_error errno) {
+	switch (errno) {
 		case CPCP_RC_OK:
 			return "";
 		case CPCP_RC_MALLOC_ERROR:
@@ -39,7 +39,6 @@ void cpcp_pack_context_init(cpcp_pack_context *pack_context, void *data,
 	pack_context->cpon_options.indent = NULL;
 	pack_context->cpon_options.json_output = 0;
 	pack_context->nest_count = 0;
-	pack_context->custom_context = NULL;
 	pack_context->bytes_written = 0;
 }
 
@@ -187,7 +186,6 @@ void cpcp_unpack_context_init(cpcp_unpack_context *self, const void *data,
 	self->parser_line_no = 1;
 	self->err_msg = "";
 	self->handle_unpack_underflow = huu;
-	self->custom_context = NULL;
 	self->container_stack = stack;
 	self->string_chunk_buff = self->default_string_chunk_buff;
 	self->string_chunk_buff_len = sizeof(self->default_string_chunk_buff);

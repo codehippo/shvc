@@ -176,7 +176,7 @@ void chainpack_pack_uint_data(cpcp_pack_context *pack_context, uint64_t num) {
 	const size_t UINT_BYTES_MAX = 18;
 	if (sizeof(num) > UINT_BYTES_MAX) {
 		pack_context->err_no = CPCP_RC_LOGICAL_ERROR; //("writeData_UInt: value
-													   // too big to pack!");
+													  // too big to pack!");
 		return;
 	}
 
@@ -273,7 +273,8 @@ void chainpack_pack_double(cpcp_pack_context *pack_context, double d) {
 	}
 }
 
-void chainpack_pack_date_time(cpcp_pack_context *pack_context, const cpcp_date_time *v) {
+void chainpack_pack_date_time(
+	cpcp_pack_context *pack_context, const cpcp_date_time *v) {
 	if (pack_context->err_no)
 		return;
 

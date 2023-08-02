@@ -1,10 +1,11 @@
-#include "rpcclient.h"
+#include <shv/rpcclient.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
@@ -14,15 +15,17 @@
 struct rpcclient_stream {
 	struct rpcclient c;
 	int rfd, wfd;
-	uint8_t packbuf[SHV_PACK_BUFSIZ];
 	uint8_t unpackbuf[SHV_UNPACK_BUFSIZ];
-	ssize_t msglen;
+	cpcp_unpack_context unpack;
+	size_t msglen;
+	uint8_t packbuf[SHV_PACK_BUFSIZ];
+	cpcp_pack_context pack;
 };
 
 
 static void overflow_handler(struct cpcp_pack_context *pack, size_t size_hint) {
 	struct rpcclient_stream *c = (struct rpcclient_stream *)(pack -
-		offsetof(struct rpcclient_stream, c.pack));
+		offsetof(struct rpcclient_stream, pack));
 
 	size_t to_send = pack->current - pack->start;
 	char *ptr_data = pack->start;
@@ -43,7 +46,7 @@ static void overflow_handler(struct cpcp_pack_context *pack, size_t size_hint) {
 
 static size_t underflow_handler(struct cpcp_unpack_context *unpack) {
 	struct rpcclient_stream *c = (struct rpcclient_stream *)(unpack -
-		offsetof(struct rpcclient_stream, c.unpack));
+		offsetof(struct rpcclient_stream, unpack));
 
 	c->msglen -= unpack->end - unpack->start;
 	ssize_t i;
@@ -61,12 +64,30 @@ static size_t underflow_handler(struct cpcp_unpack_context *unpack) {
 	return i;
 }
 
-static void nextmsg(rpcclient_t client) {
+cpcp_unpack_context *nextmsg(struct rpcclient *client) {
 	struct rpcclient_stream *sclient = (struct rpcclient_stream *)client;
 	sclient->msglen = -1;
-	sclient->msglen = chainpack_unpack_uint_data(&client->unpack, NULL);
-	if (client->unpack.err_no != CPCP_RC_OK)
-		return; // TODO error
+	sclient->msglen = chainpack_unpack_uint_data(&sclient->unpack, NULL);
+	if (sclient->unpack.err_no != CPCP_RC_OK)
+		return NULL; // TODO error
+	return &sclient->unpack;
+}
+
+cpcp_pack_context *packmsg(struct rpcclient *client, cpcp_pack_context *prev) {
+	struct rpcclient_stream *sclient = (struct rpcclient_stream *)client;
+	if (prev == NULL) {
+		cpcp_pack_context_dry_run_init(&sclient->pack);
+		return &sclient->pack;
+	}
+	if (prev->start == NULL) {
+		assert(prev == &sclient->pack);
+		size_t len = prev->bytes_written;
+		cpcp_pack_context_init(&sclient->pack, sclient->packbuf,
+			SHV_PACK_BUFSIZ, overflow_handler);
+		chainpack_pack_uint_data(&sclient->pack, len);
+		return &sclient->pack;
+	}
+	return NULL;
 }
 
 static void disconnect(rpcclient_t client) {
@@ -79,12 +100,14 @@ static void disconnect(rpcclient_t client) {
 
 rpcclient_t rpcclient_stream_new(int readfd, int writefd) {
 	struct rpcclient_stream *res = malloc(sizeof *res);
-	res->c.nextmsg = &nextmsg;
-	res->c.disconnect = &disconnect;
-	// TODO possibly just do not initialize pack context
-	cpcp_pack_context_init(&res->c.pack, &res->packbuf, 0, overflow_handler);
-	cpcp_unpack_context_init(&res->c.unpack, &res->unpackbuf, SHV_PACK_BUFSIZ,
-		underflow_handler, NULL);
+	res->c = (struct rpcclient){
+		.nextmsg = nextmsg,
+		.packmsg = packmsg,
+		.disconnect = disconnect,
+	};
+	res->unpackbuf[0] = 0; /* Note: just to shut up warning */
+	cpcp_unpack_context_init(
+		&res->unpack, res->unpackbuf, 0, underflow_handler, NULL);
 	res->rfd = readfd;
 	res->wfd = writefd;
 	res->msglen = 0;

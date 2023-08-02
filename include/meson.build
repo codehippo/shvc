@@ -9,6 +9,6 @@ libshvchainpack_headers = files(
   'shv/cpon.h',
 )
 libshvrpc_headers = files(
-  'shv/rpcurl.h',
   'shv/rpcclient.h',
+  'shv/rpcurl.h',
 )

@@ -10,8 +10,7 @@ void cpon_gmtime(int64_t epoch_sec, struct tm *tm);
 
 /******************************* P A C K **********************************/
 
-void cpon_pack_null(cpcp_pack_context *pack_context)
-	__attribute__((nonnull));
+void cpon_pack_null(cpcp_pack_context *pack_context) __attribute__((nonnull));
 
 void cpon_pack_boolean(cpcp_pack_context *pack_context, bool b)
 	__attribute__((nonnull));

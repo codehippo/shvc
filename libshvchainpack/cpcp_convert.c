@@ -3,8 +3,8 @@
 
 #include <assert.h>
 
-void cpcp_convert(cpcp_unpack_context *in_ctx, cpcp_pack_format in_format,
-	cpcp_pack_context *out_ctx, cpcp_pack_format out_format) {
+void cpcp_convert(cpcp_unpack_context *in_ctx, enum cpcp_format in_format,
+	cpcp_pack_context *out_ctx, enum cpcp_format out_format) {
 	if (!in_ctx->container_stack) {
 		// cpcp_convert() cannot worj without input context container state set
 		in_ctx->err_no = CPCP_RC_LOGICAL_ERROR;

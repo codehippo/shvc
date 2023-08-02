@@ -1,7 +1,8 @@
 #ifndef _SHV_RPCURL_H
 #define _SHV_RPCURL_H
 
-/*! Protocol used to connect client to the server or to listen for connection on  */
+/*! Protocol used to connect client to the server or to listen for connection on
+ */
 enum rpc_protocol {
 	/*! TCP/IP protocol with SHV RPC Stream link layer used to transport
 	 * messages.
@@ -57,7 +58,8 @@ struct rpcurl {
  *   parse error. Do not free returned memory using `free`, you need to use
  *   `rpcurl_free` instead.
  */
-struct rpcurl *rpcurl_parse(const char *url, const char **error_pos) __attribute__((nonnull(1)));
+struct rpcurl *rpcurl_parse(const char *url, const char **error_pos)
+	__attribute__((nonnull(1)));
 
 /*! Free RPC URL representation previously parsed using by `rpcurl_parse`.
  *
