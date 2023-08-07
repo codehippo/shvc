@@ -41,7 +41,7 @@ size_t chainpack_unpack(FILE *f, struct cpitem *item) {
 
 	/* Continue reading previous item */
 	if ((item->type == CP_ITEM_STRING || item->type == CP_ITEM_BLOB) &&
-		item->as.String.eoff != 0) {
+		!item->as.String.last) {
 		/* There is no difference between string and blob in data type and thus
 		 * we can write this code to serve them both.
 		 */
@@ -153,6 +153,7 @@ size_t chainpack_unpack(FILE *f, struct cpitem *item) {
 				item->type = CP_ITEM_CONTAINER_END;
 				break;
 			default:
+				ungetc(scheme, f);
 				item->type = CP_ITEM_INVALID;
 		}
 	}

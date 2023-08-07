@@ -121,13 +121,4 @@ ssize_t cpon_pack(FILE *, struct cpon_state *, const struct cpitem *)
 size_t cpon_unpack(FILE *, struct cpitem *) __attribute__((nonnull));
 
 
-struct json_state {
-	const char *indent;
-};
-
-ssize_t json_pack(FILE *, struct json_state *, const struct cpitem *)
-	__attribute__((nonnull));
-size_t json_unpack(FILE *, struct cpitem *) __attribute__((nonnull));
-
-
 #endif

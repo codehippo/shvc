@@ -1,5 +1,4 @@
 #include "cpon.h"
-#include "shv/cp.h"
 #include <string.h>
 #include <inttypes.h>
 #include <assert.h>
@@ -108,7 +107,7 @@ ssize_t cpon_pack(FILE *f, struct cpon_state *state, const struct cpitem *item) 
 				break;
 			case CP_ITEM_LIST:
 				if (ctxpush(state, CP_ITEM_LIST))
-					PUTS(CPON_LIST_BEGIN);
+					PUTC(CPON_LIST_BEGIN);
 				break;
 			case CP_ITEM_MAP:
 				if (ctxpush(state, CP_ITEM_MAP))
@@ -213,6 +212,8 @@ static ssize_t cpon_pack_decimal(FILE *f, const struct cpdecimal *dec) {
 	ssize_t len = snprintf(str, strsiz, "%" PRIu64, mantisa);
 	assert(len < strsiz);
 
+	// TODO sometimes we can use XXeYY format
+
 	if (neg)
 		PUTC('-');
 	int64_t i = len - 1;
@@ -228,9 +229,6 @@ static ssize_t cpon_pack_decimal(FILE *f, const struct cpdecimal *dec) {
 	for (; i >= 0; i--)
 		PUTC(str[i]);
 
-
-	PRINTF("%" PRId64 ".%" PRId64, dec->mantisa, dec->mantisa);
-	// TODO
 	return res;
 }
 
