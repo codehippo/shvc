@@ -16,59 +16,56 @@
     with builtins;
     with flake-utils.lib;
     with nixpkgs.lib; let
-      packages = pkgs:
-        with pkgs; rec {
-          shvc = stdenv.mkDerivation {
-            pname = "shvc";
-            version = replaceStrings ["\n"] [""] (readFile ./version);
-            src = builtins.path {
-              path = ./.;
-              filter = path: type: ! hasSuffix ".nix" path;
-            };
-            outputs = ["out" "doc"];
-            sphinxRoot = "../docs";
-            buildInputs = [
-              inih
-              uriparser
-              openssl
-            ];
-            nativeBuildInputs = [
-              # Build tools
-              meson
-              ninja
-              cmake
-              gperf
-              pkg-config
-              # Documentation
-              doxygen
-              (sphinxHook.overrideAttrs (oldAttrs: {
-                propagatedBuildInputs = with python3Packages; [
-                  sphinx_rtd_theme
-                  myst-parser
-                  breathe
-                ];
-              }))
-            ];
-            doCheck = true;
-            checkInputs = [
-              # Unit tests
-              check
-              pkgs.check-suite
-            ];
-            nativeCheckInputs = [
-              # Run tests
-              bash
-              bats
-              # Run tests
-              (python3.withPackages (pypkgs:
-                with pypkgs; [
-                  pytest
-                  pytest-tap
-                  pypkgs.pyshv
-                ]))
-            ];
-          };
+      version = fileContents ./version;
+      src = builtins.path {
+        path = ./.;
+        filter = path: type: ! hasSuffix ".nix" path;
+      };
+      packages = pkgs: {
+        shvc = pkgs.stdenv.mkDerivation {
+          pname = "shvc";
+          inherit version src;
+          outputs = ["out" "doc"];
+          buildInputs = with pkgs; [
+            inih
+            uriparser
+            openssl
+          ];
+          nativeBuildInputs = with pkgs; [
+            # Build tools
+            meson
+            ninja
+            cmake
+            gperf
+            pkg-config
+            # Documentation
+            doxygen
+            (sphinxHook.overrideAttrs (oldAttrs: {
+              propagatedBuildInputs = with python3Packages; [
+                sphinx_rtd_theme
+                myst-parser
+                breathe
+              ];
+            }))
+          ];
+          checkInputs = with pkgs; [
+            # Unit tests
+            check
+            pkgs.check-suite
+          ];
+          nativeCheckInputs = with pkgs; [
+            # Run tests
+            (python3.withPackages (pypkgs:
+              with pypkgs; [
+                pytest
+                pytest-tap
+                pypkgs.pyshv
+              ]))
+          ];
+          doCheck = true;
+          sphinxRoot = "../docs";
         };
+      };
     in
       {
         overlays = {
@@ -83,9 +80,9 @@
       // eachDefaultSystem (system: let
         pkgs = nixpkgs.legacyPackages.${system}.extend self.overlays.default;
       in {
-        packages = rec {
+        packages = {
           inherit (pkgs) shvc;
-          default = shvc;
+          default = pkgs.shvc;
         };
         legacyPackages = pkgs;
 
