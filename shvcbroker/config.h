@@ -25,6 +25,12 @@ struct method {
 	char* path;
 };
 
+struct path_role {
+	struct role* role;
+	const char* path;
+};
+
+
 struct role {
 	char* name;
 	size_t num_methods;
@@ -55,7 +61,7 @@ bool config_users(struct config* conf, const char* section,
 bool config_role(struct config* conf, const char* section,
 	const char* name, const char* value);
 bool config_method(struct config* conf);
-void config_method_path(const char*meth_name, struct method *method);
+void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t all_path_cnt);
 void prepare_user(struct config* conf, const char* section);
 void prepare_role(struct config* conf, const char* section);
 void free_config(struct config* conf);

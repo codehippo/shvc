@@ -215,7 +215,7 @@ void free_config(struct config* conf) { //TODO finish
 bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 	conf->methods = malloc(10 * sizeof(struct method));
 	struct role** all_methods_role = malloc(10 * sizeof(struct role*));
-	struct role** all_path_role = malloc(10 * sizeof(struct role*));
+	struct path_role* all_path_role = malloc(10 * sizeof(struct path_role));
 	size_t all_methods_cnt=0;
 	size_t all_path_cnt=0;
 	conf->num_methods = 0;
@@ -233,7 +233,7 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		while (token_1 != NULL) {
 			conf->num_methods++;
 			conf->roles[i].num_methods++;
-			config_method_path(token_1,&conf->methods[conf->num_methods-1]);
+			config_method_path(token_1,&conf->methods[conf->num_methods-1],all_path_role,all_path_cnt);
 			conf->roles[i].methods[conf->roles[i].num_methods-1]=&conf->methods[conf->num_methods-1];
 			token_1= strtok(NULL," ");
 		}
@@ -241,8 +241,9 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 	}
 }
 
-void config_method_path(const char* meth_name, struct method* method){
+void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t all_path_cnt){
 	int path_len;
+	printf("%s-----------------------\n",meth_name);
 	for(path_len=0;path_len<strlen(meth_name);path_len++){
 		if(meth_name[path_len]==':')
 			break;
