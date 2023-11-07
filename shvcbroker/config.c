@@ -214,6 +214,10 @@ void free_config(struct config* conf) { //TODO finish
 
 bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 	conf->methods = malloc(10 * sizeof(struct method));
+	struct role** all_methods_role = malloc(10 * sizeof(struct role*));
+	struct role** all_path_role = malloc(10 * sizeof(struct role*));
+	size_t all_methods_cnt=0;
+	size_t all_path_cnt=0;
 	conf->num_methods = 0;
 
 	for (int i = 0; i < conf->num_roles; i++) {
@@ -221,7 +225,8 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		conf->roles[i].methods= malloc(10*sizeof (struct method*));
 		char* ptr = strdup(conf->roles[i].txt_methods);
 		if(ptr[0]==':') { //TODO THERE SHOULD BE EVERY METHOD THERE IScd
-			conf->roles[i].methods=&conf->methods;
+			all_methods_cnt++;
+			all_methods_role[all_methods_cnt-1]=&conf->roles[i];
 			continue;
 		}
 		char* token_1 = strtok(ptr, " ");
