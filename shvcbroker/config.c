@@ -224,7 +224,7 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		conf->roles[i].num_methods=0;
 		conf->roles[i].methods= malloc(10*sizeof (struct method*));
 		char* ptr = strdup(conf->roles[i].txt_methods);
-		if(ptr[0]==':') { //TODO THERE SHOULD BE EVERY METHOD THERE IScd
+		if(ptr[0]==':') {
 			all_methods_cnt++;
 			all_methods_role[all_methods_cnt-1]=&conf->roles[i];
 			continue;
@@ -233,24 +233,30 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		while (token_1 != NULL) {
 			conf->num_methods++;
 			conf->roles[i].num_methods++;
-			config_method_path(token_1,&conf->methods[conf->num_methods-1],all_path_role,all_path_cnt);
+			config_method_path(token_1,&conf->methods[conf->num_methods-1],all_path_role,&all_path_cnt,&conf->roles[i]);
 			conf->roles[i].methods[conf->roles[i].num_methods-1]=&conf->methods[conf->num_methods-1];
-			token_1= strtok(NULL," ");
+			token_1=strtok(NULL," ");
 		}
 		free(ptr);
 	}
+	for(int i=0;i<all_path_cnt;i++){
+		printf("ůůůůůůůůůůůůůůůůůůůůůůůů     %s %s\n",all_path_role[i].path,all_path_role[i].role->name);
+	}
 }
 
-void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t all_path_cnt){
+void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
 	int path_len;
-	printf("%s-----------------------\n",meth_name);
 	for(path_len=0;path_len<strlen(meth_name);path_len++){
 		if(meth_name[path_len]==':')
 			break;
 	}
 	method->path= strndup(meth_name,path_len);
-	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){//TODO idk bad if
-		method->name=NULL;
+	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
+		(*all_path_cnt)++;
+		path_role[*all_path_cnt-1].path=strdup(meth_name);
+		path_role[*all_path_cnt-1].role=role;
+		printf("HEIL HITLER \n \n");
+		printf("%s\n",role->name);
 		return ;
 	}
 	meth_name +=path_len+1;
