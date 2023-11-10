@@ -178,12 +178,15 @@ void load_config(int argc, char **argv) {
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
-	for(int s=0;s<conf->num_roles;s++){
-		for(int i=0;i<conf->roles[s].num_methods;i++){
-			printf("%s - %s\n",conf->roles[s].methods[i]->path,conf->roles[s].methods[i]->name);
-		}
-		printf("\n----------\n");
-
+//	for(int s=0;s<conf->num_roles;s++){
+//		for(int i=0;i<conf->roles[s].num_methods;i++){
+//			printf("%s - %s\n",conf->roles[s].methods[i]->path,conf->roles[s].methods[i]->name);
+//		}
+//		printf("\n----------\n");
+//
+//	}
+	for(int i=0;i<conf->num_methods;i++){
+		printf("%s\n",conf->methods[i].name);
 	}
 	free_config(conf);
 }
@@ -239,27 +242,37 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		}
 		free(ptr);
 	}
-	for(int i=0;i<all_path_cnt;i++){
-		printf("ůůůůůůůůůůůůůůůůůůůůůůůů     %s %s\n",all_path_role[i].path,all_path_role[i].role->name);
-	}
+//	for(int i=0;i<all_methods_cnt;i++){
+//		printf(" %s\n",all_methods_role[i]->name);
+//	}
+	config_path_method_all(all_methods_role,all_path_role,all_path_cnt,all_methods_cnt);
 }
 
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
 	int path_len;
 	for(path_len=0;path_len<strlen(meth_name);path_len++){
-		if(meth_name[path_len]==':')
+		if(meth_name[path_len]==':') {
 			break;
+		}
 	}
 	method->path= strndup(meth_name,path_len);
 	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
-		method->name=NULL;
+			method->name=NULL;
 		(*all_path_cnt)++;
 		path_role[*all_path_cnt-1].path=strdup(meth_name);
 		path_role[*all_path_cnt-1].role=role;
-		printf("HEIL HITLER \n \n");
-		printf("%s\n",role->name);
-		return ;
+		return;
 	}
 	meth_name +=path_len+1;
 	method->name= strdup(meth_name);
 }
+void config_path_method_all(struct role** roles_all, struct path_role* path_role,  size_t all_path_cnt, size_t all_methods_cnt){
+	for(int i=0;i<all_path_cnt;i++){
+		printf("%s %s\n",path_role[i].path, path_role[i].role->name);
+	}
+	printf("---------------\n");
+	for(int i=0;i<all_methods_cnt;i++){
+		printf("%s \n",roles_all[i]->name);
+	}
+}
+

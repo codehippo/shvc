@@ -62,6 +62,7 @@ bool config_role(struct config* conf, const char* section,
 	const char* name, const char* value);
 bool config_method(struct config* conf);
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt, struct role* role);
+void config_path_method_all(struct role** roles_all, struct path_role* path_role,  size_t all_path_cnt, size_t all_methods_cnt);
 void prepare_user(struct config* conf, const char* section);
 void prepare_role(struct config* conf, const char* section);
 void free_config(struct config* conf);
