@@ -252,6 +252,7 @@ void config_method_path(const char* meth_name, struct method* method, struct pat
 	}
 	method->path= strndup(meth_name,path_len);
 	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
+		method->name=NULL;
 		(*all_path_cnt)++;
 		path_role[*all_path_cnt-1].path=strdup(meth_name);
 		path_role[*all_path_cnt-1].role=role;
