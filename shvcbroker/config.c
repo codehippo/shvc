@@ -186,6 +186,7 @@ void load_config(int argc, char **argv) {
 //		printf("%s \n",conf->methods[i].name);
 //	}
 	free_config(conf);
+
 }
 
 void free_config(struct config* conf) { //TODO finish
@@ -213,12 +214,6 @@ void free_config(struct config* conf) { //TODO finish
 }
 
 bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
-	conf->methods = malloc(10 * sizeof(struct method));
-	struct role** all_methods_role = malloc(10 * sizeof(struct role));
-	struct path_role* all_path_role = malloc(10 * sizeof(struct path_role));
-	size_t all_methods_cnt=0;
-	size_t all_path_cnt=0;
-	conf->num_methods = 0;
 
 	for (int i = 0; i < conf->num_roles; i++) {
 
