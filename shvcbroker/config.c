@@ -171,7 +171,7 @@ void load_config(int argc, char **argv) {
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
-	config_method(conf);
+	add_method(conf);
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
@@ -187,6 +187,67 @@ void load_config(int argc, char **argv) {
 //	}
 	free_config(conf);
 
+}
+
+bool add_method(struct config* conf) { // TODO jenom ":" pomocí counter
+
+	for (int i = 0; i < conf->num_roles; i++) {
+		conf->roles[i].methods=malloc(10 * sizeof(struct method));
+		char* ptr = strdup(conf->roles[i].txt_methods);
+		printf("----%s\n",conf->roles[i].txt_methods);
+		if(ptr[0]==':') {
+			free(ptr);
+			free_method(conf->roles[i].methods,&conf->roles[i].num_methods);
+			conf->roles[i].num_methods++;
+			conf->roles[i].methods[0].name=NULL;
+			conf->roles[i].methods[0].path=NULL;
+			continue;
+		}
+		char* token_1 = strtok(ptr, " ");
+		while (token_1 != NULL) {
+			conf->roles[i].num_methods++;
+			config_method(token_1,&conf->roles[i].methods[conf->roles[i].num_methods-1]);
+			token_1=strtok(NULL," ");
+		}
+		free(ptr);
+	}
+
+}
+
+void config_method(const char* meth_name, struct method* method){
+	int path_len;
+	for(path_len=0;path_len<strlen(meth_name);path_len++){
+		if(meth_name[path_len]==':') {
+			break;
+		}
+	}
+	method->path= strndup(meth_name,path_len);
+
+	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
+		method->path= strdup(meth_name);
+		method->name=NULL;
+		return ;
+	}
+
+}
+
+void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
+	int path_len;
+	for(path_len=0;path_len<strlen(meth_name);path_len++){
+		if(meth_name[path_len]==':') {
+			break;
+		}
+	}
+	method->path= strndup(meth_name,path_len);
+	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
+		method->name=NULL;
+		(*all_path_cnt)++;
+		path_role[*all_path_cnt-1].path=strdup(meth_name);
+		path_role[*all_path_cnt-1].role=role;
+		return;
+	}
+	meth_name +=path_len+1;
+	method->name= strdup(meth_name);
 }
 
 void free_config(struct config* conf) { //TODO finish
@@ -213,41 +274,6 @@ void free_config(struct config* conf) { //TODO finish
 	free(conf);
 }
 
-bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
-
-	for (int i = 0; i < conf->num_roles; i++) {
-
-		char* ptr = strdup(conf->roles[i].txt_methods);
-		if(ptr[0]==':') {
-			continue;
-		}
-		char* token_1 = strtok(ptr, " ");
-		while (token_1 != NULL) {
-			conf->roles[i].num_methods++;
-			config_method_path(token_1,&conf->methods[conf->num_methods-1],all_path_role,&all_path_cnt,&conf->roles[i]);
-			conf->roles[i].methods[conf->roles[i].num_methods-1]=&conf->methods[conf->num_methods-1];
-			token_1=strtok(NULL," ");
-		}
-		free(ptr);
-	}
-
-}
-
-void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
-	int path_len;
-	for(path_len=0;path_len<strlen(meth_name);path_len++){
-		if(meth_name[path_len]==':') {
-			break;
-		}
-	}
-	method->path= strndup(meth_name,path_len);
-	if(meth_name[path_len]==':' && strlen(meth_name)==path_len+1){
-		method->name=NULL;
-		(*all_path_cnt)++;
-		path_role[*all_path_cnt-1].path=strdup(meth_name);
-		path_role[*all_path_cnt-1].role=role;
-		return;
-	}
-	meth_name +=path_len+1;
-	method->name= strdup(meth_name);
+void free_method(struct method* methods,size_t* num_methods){
+	num_methods=0;
 }

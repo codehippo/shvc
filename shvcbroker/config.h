@@ -37,7 +37,7 @@ struct role {
 	char* other_roles;
 	char* access;
 	char* txt_methods;
-	struct method** methods;
+	struct method* methods;
 };
 
 struct config {
@@ -60,11 +60,13 @@ bool add_user(struct config* conf, const char* section,
 	const char* name, const char* value);
 bool add_role(struct config* conf, const char* section,
 	const char* name, const char* value);
-bool config_method(struct config* conf);
+bool add_method(struct config* conf);
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt, struct role* role);
+void config_method(const char* meth_name, struct method* method);
 void prepare_user(struct config* conf, const char* section);
 void prepare_role(struct config* conf, const char* section);
 void free_config(struct config* conf);
+void free_method(struct method* methods,size_t* num_methods);
 
 #endif
 
