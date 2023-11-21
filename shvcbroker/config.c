@@ -10,11 +10,10 @@ static int handler(void* user, const char* section, const char* name,
 	const char* value) {
 	if(!strlen(section) || !strlen(name) || !strlen(value))
 		return 0;
-	//	printf("%s....%s....%s\n",section,name,value);
 	struct config* conf = (struct config*)user;
 
 	if(!strcmp(section,"listen")){
-		if(!config_listen(conf,name, value)) { //TODO Error message and exit
+		if(!add_listen(conf,name, value)) { //TODO Error message and exit
 			return 0;
 		}
 	} else if(!strncmp(section,"users.",6)){
@@ -22,7 +21,7 @@ static int handler(void* user, const char* section, const char* name,
 			prepare_user(conf,section);
 		}
 
-		if(!config_users(conf, section, name, value)) {
+		if(!add_user(conf, section, name, value)) {
 			return 0;
 		}
 	}
@@ -31,7 +30,7 @@ static int handler(void* user, const char* section, const char* name,
 			prepare_role(conf, section);
 		}
 
-		if(!config_role(conf,section,name, value)){
+		if(!add_role(conf,section,name, value)){
 			return 0;
 		}
 
@@ -41,7 +40,7 @@ static int handler(void* user, const char* section, const char* name,
 	return 1;
 }
 
-bool config_listen(struct config* conf, const char* name, const char* value) {
+bool add_listen(struct config* conf, const char* name, const char* value) {
 	if(!strcmp(name,"internet")){
 		conf->internet= strdup(value);
 		return 1;
@@ -54,7 +53,7 @@ bool config_listen(struct config* conf, const char* name, const char* value) {
 	return 0;
 }
 
-bool config_users(struct config* conf, const char* section, const char* name, const char* value) {
+bool add_user(struct config* conf, const char* section, const char* name, const char* value) {
 
 	if(!strcmp(name,"password")){
 		conf->users[conf->num_users-1].password= strdup(value);
@@ -72,7 +71,7 @@ bool config_users(struct config* conf, const char* section, const char* name, co
 	return 0;
 }
 
-bool config_role(struct config* conf, const char* section,
+bool add_role(struct config* conf, const char* section,
 	const char* name, const char* value){
 
 	if(!strcmp(name,"roles")){
@@ -162,15 +161,13 @@ void load_config(int argc, char **argv) {
 		printf("Can't load '%s'\n", config_file);
 		return ;
 	}
-	//    printf("%s\n%s",conf->internet, conf->unixx);
-	//    printf("\n-----------\n");
-	//	for(int i=0; i<conf->num_users;i++){
-	//		printf("%s--%s--%s--%s\n",conf->users[i].name,conf->users[i].password,conf->users[i].sha1pass,conf->users[i].role);
-	//	}
-	//    printf("\n-----------\n");
-	//    for(int i=0; i<conf->num_roles;i++){
-	//        printf("%s--%s--%s--%s\n",conf->roles[i].name,conf->roles[i].access, conf->roles[i].other_roles, conf->roles[i].txt_methods);
-	//    }
+//		for(int i=0; i<conf->num_users;i++){
+//			printf("%s--%s--%s--%s\n",conf->users[i].name,conf->users[i].password,conf->users[i].sha1pass,conf->users[i].role);
+//		}
+//	    printf("\n-----------\n");
+//	    for(int i=0; i<conf->num_roles;i++){
+//	        printf("%s--%s--%s--%s\n",conf->roles[i].name,conf->roles[i].access, conf->roles[i].other_roles, conf->roles[i].txt_methods);
+//	    }
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
 	//	printf("\n-----------\n");
@@ -224,17 +221,13 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 	conf->num_methods = 0;
 
 	for (int i = 0; i < conf->num_roles; i++) {
-		conf->roles[i].num_methods=0;
-		conf->roles[i].methods= malloc(10*sizeof (struct method*));
+
 		char* ptr = strdup(conf->roles[i].txt_methods);
 		if(ptr[0]==':') {
-			all_methods_cnt++;
-			all_methods_role[all_methods_cnt-1]=&conf->roles[i];
 			continue;
 		}
 		char* token_1 = strtok(ptr, " ");
 		while (token_1 != NULL) {
-			conf->num_methods++;
 			conf->roles[i].num_methods++;
 			config_method_path(token_1,&conf->methods[conf->num_methods-1],all_path_role,&all_path_cnt,&conf->roles[i]);
 			conf->roles[i].methods[conf->roles[i].num_methods-1]=&conf->methods[conf->num_methods-1];
@@ -242,10 +235,7 @@ bool config_method(struct config* conf) { // TODO jenom ":" pomocí counter
 		}
 		free(ptr);
 	}
-//	for(int i=0;i<all_methods_cnt;i++){
-//		printf(" %s\n",all_methods_role[i]->name);
-//	}
-	config_path_method_all(all_methods_role,all_path_role,all_path_cnt,all_methods_cnt,conf);
+
 }
 
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
@@ -266,17 +256,3 @@ void config_method_path(const char* meth_name, struct method* method, struct pat
 	meth_name +=path_len+1;
 	method->name= strdup(meth_name);
 }
-void config_path_method_all(struct role** roles_all, struct path_role* path_role,  size_t all_path_cnt, size_t all_methods_cnt, struct config* conf){
-//	for(int i=0;i<all_path_cnt;i++){
-//		printf("%s %s\n",path_role[i].path, path_role[i].role->name);
-//	}
-//	for(int i=0;i<all_methods_cnt;i++){
-//		roles_all[i]->methods=&conf->methods;
-//		printf("%s",roles_all[i]->methods[0]->name);
-//	}
-	roles_all[0]->methods=conf->methods;
-	printf("----%s\n",roles_all[0]->methods[1]->name);
-	struct method* lol=conf->methods;
-//	printf("%s\n",lol[1].name);
-}
-

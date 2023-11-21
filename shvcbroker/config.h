@@ -54,15 +54,14 @@ struct config {
 void load_config(int argc, char **argv) __attribute__((nonnull));
 static int handler(void* user, const char* section, const char* name,
 	const char* value);
-bool config_listen(struct config* conf, const char* section,
+bool add_listen(struct config* conf, const char* section,
 	const char* name);
-bool config_users(struct config* conf, const char* section,
+bool add_user(struct config* conf, const char* section,
 	const char* name, const char* value);
-bool config_role(struct config* conf, const char* section,
+bool add_role(struct config* conf, const char* section,
 	const char* name, const char* value);
 bool config_method(struct config* conf);
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt, struct role* role);
-void config_path_method_all(struct role** roles_all, struct path_role* path_role,  size_t all_path_cnt, size_t all_methods_cnt, struct config* conf);
 void prepare_user(struct config* conf, const char* section);
 void prepare_role(struct config* conf, const char* section);
 void free_config(struct config* conf);
