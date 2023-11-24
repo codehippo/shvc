@@ -61,7 +61,6 @@ bool add_user(struct config* conf, const char* section, const char* name, const 
 	}
 	if(!strcmp(name,"sha1pass")){
 		conf->users[conf->num_users-1].sha1pass= strdup(value);
-		printf("%s\n\n",conf->users[conf->num_users-1].sha1pass);
 		return 1;
 	}
 	if(!strcmp(name,"roles")){
@@ -161,30 +160,20 @@ void load_config(int argc, char **argv) {
 		printf("Can't load '%s'\n", config_file);
 		return ;
 	}
-//		for(int i=0; i<conf->num_users;i++){
-//			printf("%s--%s--%s--%s\n",conf->users[i].name,conf->users[i].password,conf->users[i].sha1pass,conf->users[i].role);
-//		}
-//	    printf("\n-----------\n");
-//	    for(int i=0; i<conf->num_roles;i++){
-//	        printf("%s--%s--%s--%s\n",conf->roles[i].name,conf->roles[i].access, conf->roles[i].other_roles, conf->roles[i].txt_methods);
-//	    }
-	//	printf("\n-----------\n");
-	//	printf("\n-----------\n");
-	//	printf("\n-----------\n");
+
 	add_method(conf);
-	//	printf("\n-----------\n");
-	//	printf("\n-----------\n");
-	//	printf("\n-----------\n");
-//	for(int s=0;s<conf->num_roles;s++){
-//		for(int i=0;i<conf->roles[s].num_methods;i++){
-//			printf("%s - %s\n",conf->roles[s].methods[i]->path,conf->roles[s].methods[i]->name);
-//		}
-//		printf("\n----------\n");
-//
-//	}
-//	for(int i=0;i<conf->num_methods;i++){
-//		printf("%s \n",conf->methods[i].name);
-//	}
+
+	for(int s=0;s<conf->num_roles;s++){
+		printf("***%s***\n",conf->roles[s].name);
+		for(int i=0;i<conf->roles[s].num_methods;i++){
+			printf("%s - %s\n",conf->roles[s].methods[i].path,conf->roles[s].methods[i].name);
+		}
+//		free_method(conf->roles[s].methods,&conf->roles[s].num_methods);
+		printf("\n----------\n");
+
+	}
+
+
 	free_config(conf);
 
 }
@@ -192,9 +181,9 @@ void load_config(int argc, char **argv) {
 bool add_method(struct config* conf) { // TODO jenom ":" pomocí counter
 
 	for (int i = 0; i < conf->num_roles; i++) {
+		if(conf->roles[i].num_methods)
 		conf->roles[i].methods=malloc(10 * sizeof(struct method));
 		char* ptr = strdup(conf->roles[i].txt_methods);
-		printf("----%s\n",conf->roles[i].txt_methods);
 		if(ptr[0]==':') {
 			free(ptr);
 			free_method(conf->roles[i].methods,&conf->roles[i].num_methods);
@@ -228,7 +217,8 @@ void config_method(const char* meth_name, struct method* method){
 		method->name=NULL;
 		return ;
 	}
-
+	method->path= strndup(meth_name,path_len);
+	method->name= strdup(meth_name +=path_len+1);
 }
 
 void config_method_path(const char* meth_name, struct method* method, struct path_role* path_role, size_t* all_path_cnt,struct role* role){
@@ -248,6 +238,15 @@ void config_method_path(const char* meth_name, struct method* method, struct pat
 	}
 	meth_name +=path_len+1;
 	method->name= strdup(meth_name);
+}
+
+void free_method(struct method* methods,size_t* num_methods){
+	for(int i=0;i<*num_methods;i++){
+		free(methods[i].name);
+		free(methods[i].path);
+	}
+	*num_methods=0;
+
 }
 
 void free_config(struct config* conf) { //TODO finish
@@ -272,8 +271,4 @@ void free_config(struct config* conf) { //TODO finish
 	free(conf->internet);
 	free(conf->unixx);
 	free(conf);
-}
-
-void free_method(struct method* methods,size_t* num_methods){
-	num_methods=0;
 }
